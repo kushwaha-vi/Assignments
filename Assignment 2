@@ -1,0 +1,161 @@
+import java.util.*;
+
+public class Qcksort {
+	static int cntcmp;
+	static long len;
+	static List<Integer> gv1= new ArrayList<>();
+	static List<Integer> gv2= new ArrayList<>();
+	static List<Integer> gv3= new ArrayList<>();
+	
+	static void quck_type1(int st,int en){
+		if(st>=en) return;
+		int pv= st;
+		
+		cntcmp+= en-st;
+		int i= st+1;
+		int j=st+1;
+		
+		while(i<=en && j<=en){
+			if(gv1.get(pv) > gv1.get(j)){
+				Integer tmp= gv1.get(i);
+				gv1.set(i, gv1.get(j));
+				gv1.set(j, tmp);
+				i++;
+			}
+			j++;
+		}
+		
+		Integer tmp= gv1.get(i-1);
+		gv1.set(i-1, gv1.get(st));
+		gv1.set(st, tmp);
+		
+		quck_type1(st,i-2);
+		quck_type1(i,en);
+	}
+	
+	static void quck_type2(int st,int en){
+		if(st>=en) return;
+		
+		int pv= st;
+		
+		Integer tep= gv2.get(st);
+		gv2.set(st,gv2.get(en));
+		gv2.set(en,tep);
+		
+		
+		cntcmp+= en-st;
+		int i= st+1;
+		int j=st+1;
+		
+		while(i<=en && j<=en){
+			if(gv2.get(pv) > gv2.get(j)){
+				Integer tmp= gv2.get(i);
+				gv2.set(i, gv2.get(j));
+				gv2.set(j, tmp);
+				i++;
+			}
+			j++;
+		}
+		
+		Integer tmp= gv2.get(i-1);
+		gv2.set(i-1, gv2.get(st));
+		gv2.set(st, tmp);
+		
+		quck_type2(st,i-2);
+		quck_type2(i,en);
+	}
+	
+	static int fnd_med(int x,int y,int z){
+		if((x>=y && x<=z) || (x>=z && x<=y)) return 1;
+		if((x<=y && y<=z) || (x>=y && y>=z)) return 2;
+		if((x<=z && z<=y) || (x>=z && y<=z)) return 3;
+		
+		return -1;
+	}
+	
+	static void quck_type3(int st,int en){
+		if(st>=en) return;
+		
+		int pv= st;
+		
+		int id = fnd_med(gv3.get(st),gv3.get(st+(en-st)/2),gv3.get(en));
+		
+		//System.out.println(id);
+		
+		if(id==2){
+			Integer tep= gv3.get(st);
+			gv3.set(st,gv3.get(st+(en-st)/2));
+			gv3.set(st+(en-st)/2,tep);
+		}else if(id==3){
+			Integer tep= gv3.get(st);
+			gv3.set(st,gv3.get(en));
+			gv3.set(en,tep);
+		}
+		
+		cntcmp+= en-st;
+		int i= st+1;
+		int j=st+1;
+		
+		while(i<=en && j<=en){
+			if(gv3.get(pv) > gv3.get(j)){
+				Integer tmp= gv3.get(i);
+				gv3.set(i, gv3.get(j));
+				gv3.set(j, tmp);
+				i++;
+			}
+			j++;
+		}
+		
+		Integer tmp= gv3.get(i-1);
+		gv3.set(i-1, gv3.get(st));
+		gv3.set(st, tmp);
+		
+		quck_type3(st,i-2);
+		quck_type3(i,en);
+	}
+	
+	public static void main(String[] args){
+		Scanner sc= new Scanner(System.in);
+		
+		for(int i=0;i<10000;i++){
+			gv1.add(sc.nextInt());
+			gv2.add(gv1.get(i));
+			gv3.add(gv1.get(i));
+		}
+		
+		cntcmp=0;
+		quck_type1(0,10000-1);
+		
+		System.out.println(cntcmp);
+		
+//		for(int i=0;i<5;i++){
+//			System.out.print(gv1.get(i)+" ");
+//		}
+//		System.out.println();
+		cntcmp=0;
+		
+		quck_type2(0,10000-1);
+		
+		System.out.println(cntcmp);
+		
+		
+//		for(int i=0;i<5;i++){
+//			System.out.print(gv2.get(i)+" ");
+//		}
+//		System.out.println();
+		
+		cntcmp=0;
+		
+		quck_type3(0,10000-1);
+		
+		System.out.println(cntcmp);
+		
+		
+//		for(int i=0;i<5;i++){
+//			System.out.print(gv3.get(i)+" ");
+//		}
+//		System.out.println();
+		
+		sc.close();
+	}
+}
