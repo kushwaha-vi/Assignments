@@ -1,0 +1,155 @@
+#include <cstdio>
+#include <iostream>
+#include <vector>
+#include <ctime>
+#include <algorithm>
+#include <climits>
+#include <cstdlib>
+
+using namespace std;
+
+vector<int> adj[300];
+vector<pair<int,int> >gve;
+
+vector<int> pick;
+
+class union_find{
+    public:
+    vector<int> sz,pr;
+    int len;
+
+    union_find(int n){
+        sz.resize(n+1);
+        pr.resize(n+1);
+        len=n;
+
+        for(int i=0;i<n;i++){
+            pr[i]=i;
+            sz[i]= adj[i].size();
+        }
+    }
+
+    ~union_find(){
+        sz.clear();
+        pr.clear();
+    }
+
+    int find_f(int x){
+        // cout << x << " ";
+        while(x!=pr[x]){
+            pr[x]=pr[pr[x]];
+            x=pr[x];
+        }
+        // cout << x << " ";
+        return x;
+    }
+
+    bool chk_prnt(int x,int y){
+        return find_f(x)==find_f(y);
+    }
+
+    void join_t(int x,int y){
+        int i= find_f(x);
+        int j= find_f(y);
+
+        if(sz[i] >= sz[j]){
+            pr[j]=i;
+            sz[i]+=sz[j];
+        }else{
+            pr[i]=j;
+            sz[j]+=sz[i];
+        }
+    }
+
+    bool cnt_ind(){
+        int ret=0;
+        for(int i=0;i<len;i++){
+            if(pr[i]==i) ret++;
+        }
+        //cout << ret << endl;
+        if(ret>2) return true;
+        return false;
+    }
+};
+
+int main(){
+    freopen("input.txt","r",stdin);
+    freopen("out.txt","w",stdout);
+    int n;
+    scanf("%d",&n);
+    string gv;
+    getline(cin,gv);
+    for(int i=0;i<n;i++){
+        getline(cin ,gv);
+        int l= gv.length();
+        int v,fl=0;
+        for(int j=0;j<l;){
+            while(j<l && (gv[j]<'0' || gv[j]>'9')) j++;
+            int tp=0,f=0;
+            while(j<l && (gv[j]>='0' && gv[j]<='9')){
+                tp= tp*10 + (int)(gv[j]-'0');
+                j++;
+                f++;
+            }
+
+            if(fl==0 && f>0){
+                v= tp;
+                fl++;
+            }else if(f>0){
+                adj[v-1].push_back(tp-1);
+                gve.push_back(make_pair(v-1,tp-1));
+            }
+        }
+         cout << v-1 << " ";
+         for(int j=0;j<adj[v-1].size();j++) cout << adj[v-1][j] << " ";
+         cout << endl;
+    }
+
+    for(int i=0;i<gve.size();i++){
+        pick.push_back(i);
+    }
+
+    int counter=0;
+    int mn= INT_MAX;
+    while(counter< 100){
+        random_shuffle(pick.begin(),pick.end());
+        int j=0;
+
+        union_find UF(n);
+
+        while(j< gve.size() && UF.cnt_ind()){
+            int u= gve[pick[j]].first;
+            int v= gve[pick[j]].second;
+            //cout << u << " " << v << " ";
+            if(! UF.chk_prnt(u,v)){
+                UF.join_t(u,v);
+            }
+            j++;
+
+            // for(int k=0;k<n;k++) cout << UF.pr[k] << " ";
+            // cout << endl;
+        }
+
+        int cnt=0;
+        for(int i=0;i<gve.size();i++){
+            int u= gve[i].first;
+            int v= gve[i].second;
+            // cout << "ok1" << endl;
+            // cout << u << " " << v << endl;
+            if(! UF.chk_prnt(u,v)){
+                cnt++;
+            }
+            // cout << endl << "ok2" << endl;
+        }
+        cnt/=2;
+        mn=min(mn,cnt);
+        // for(int k=0;k<n;k++) cout << UF.pr[k] << " ";
+            // cout << endl;
+        counter++;
+        // cout << counter << endl;
+    }
+
+    cout << mn << endl;
+
+    return 0;
+}
