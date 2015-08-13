@@ -1,0 +1,87 @@
+#include <cstdio>
+#include <iostream>
+#include <vector>
+#include <queue>
+
+using namespace std;
+
+#define pb push_back
+#define mp make_pair
+
+vector<pair<int,int> >gv[202];
+string str;
+vector<int> dist;
+vector<bool> mrk;
+
+void do_cal(int id){
+    int l= str.length();
+    for(int i=0;i<l;i++){
+        if(str[i]>='0' && str[i]<='9'){
+            int ed=0,wg=0;
+            while(i<l && str[i]>='0' && str[i]<='9'){
+                ed=ed*10+(int)(str[i]-'0');
+                i++;
+            }
+            i++;
+            while(i<l && str[i]>='0' && str[i]<='9'){
+                wg= wg*10+(int)(str[i]-'0');
+                i++;
+            }
+            gv[id].pb(mp(ed-1,wg));
+        }
+    }
+    return;
+}
+
+void do_dij(int st){
+    priority_queue<pair<int,int> , vector<pair<int,int> >, greater<pair<int,int> > >pq;
+    pq.push(mp(0,st));
+    
+    while(!pq.empty()){
+        pair<int,int> tp= pq.top();
+        pq.pop();
+        
+        int u= tp.second;
+        int d= tp.first;
+        
+        if(mrk[u]) continue;
+        
+        mrk[u]= true;
+        dist[u]=d;
+        
+        for(int i=0;i<gv[u].size();i++){
+            int v= gv[u][i].first, vl= gv[u][i].second;
+            if(!mrk[v] && dist[v] > dist[u]+vl){
+                dist[v]=dist[u]+vl;
+                pq.push(mp(dist[v],v));
+            }
+        }
+    }
+    
+    return;
+}
+        
+
+int main(){
+    for(int i=0;i<200;i++){
+        int x;
+        cin >> x;
+        getline(cin,str);
+        do_cal(x-1);
+        
+        //for(int j=0;j<gv[x-1].size();j++) cout << gv[x-1][j].first << " " << gv[x-1][j].second << endl;
+    }
+    
+    dist.resize(204,1000000);
+    mrk.resize(204,false);
+    
+    do_dij(0);
+	
+	int pos[]= {7,37,59,82,99,115,133,165,188,197};
+	
+	for(int i=0;i<10;i++){
+		cout << dist[pos[i]-1] << ",";
+	}
+	cout << endl;
+    return 0;
+}
