@@ -1,0 +1,354 @@
+/*
+
+The goal of this problem is to implement a variant of the 2-SUM algorithm
+
+*/
+
+#include<cstdio>
+#include<iostream>
+#include<cmath>
+#include<vector> 
+#include<climits>
+
+using namespace std;
+
+#define int64 long long
+#define pb push_back
+
+vector<vector<int64> >str;
+vector<int64> gv,mrk;
+
+int main(){
+	   int n= 1000000;
+	   int mx=INT_MIN,mn= INT_MAX;
+	   
+	   for(int i=0;i<n;i++){
+	   		int64 x;
+	   		scanf("%lld",&x);
+	   		gv.pb(x);
+	   		int64 t= x/10000;
+	   		if(mx<t) mx= t;
+	   		if(mn>t) mn= t;
+	   }
+	  
+	   str.resize(mx-mn+1);
+	   
+	   for(int i=0;i<gv.size();i++){
+	   	int64 t= gv[i]/10000;
+	   	str[t-mn].pb(gv[i]);
+	   }
+	   
+	   //cout << str[0].size() << endl;
+	   
+	   mrk.resize(20001,0);
+	   
+	   int lg= mx-mn;
+	   
+	   int cnt=0;
+	   
+	   // code here..
+	   
+	   for(int i=0;i<=lg;i++){
+	   	if(str[i].size() > 0){
+	   		int ri= i+mn;
+	   		int pi= -1*ri;
+	   		int j= pi-mn;
+	   		
+	   		if(j>=0){
+	   			for(int g=0;g<str[j].size();g++){
+	   				for(int h=0;h<str[i].size();h++){
+	   					if(abs(str[i][h]+str[j][g])<=10000) mrk[str[i][h]+str[j][g]+10000]++;
+	   				}
+	   			}
+	   		}
+	   		
+	   		if(j>0){
+	   			j=j-1;
+	   			for(int g=0;g<str[j].size();g++){
+	   				for(int h=0;h<str[i].size();h++){
+	   					if(abs(str[i][h]+str[j][g])<=10000) mrk[str[i][h]+str[j][g]+10000]++;
+	   				}
+	   			}
+	   		}
+	   		
+	   		if(j<lg-1){
+	   			 j+=2;
+	   			 for(int g=0;g<str[j].size();g++){
+	   				for(int h=0;h<str[i].size();h++){
+	   					if(abs(str[i][h]+str[j][g])<=10000) mrk[str[i][h]+str[j][g]+10000]++;
+	   				}
+	   			}
+	   		}
+	   	}
+	   }					
+	   
+	   for(int i=0;i<=20000;i++) if(mrk[i]) cnt++;
+
+	   cout << cnt << endl; 
+	   		
+	   
+	   return 0;
+}
+
+
+
+/*
+
+The goal of this problem is to implement the "Median Maintenance" algorithm
+
+*/
+
+#include <cstdio>
+#include <iostream>
+#include <cstring>
+#include <vector>
+
+using namespace std;
+
+#define pb push_back
+
+class MinHeap{
+	private:
+		vector<int> tree;
+		int hpsze;
+		
+		int getLeftChildIdx(int i){
+			return 2*i;
+		}
+		
+		int getRightChildIdx(int i){
+			return 2*i+1;
+		}
+		
+		int getParentIdx(int i){
+			return i/2;
+		}
+		
+	public:
+		
+		MinHeap(int n){
+			        tree.resize(4*n);
+			        hpsze=0;
+		}
+		
+		bool isEmpty(){
+			return (hpsze==0);
+		}
+		
+		int getSize(){
+			return hpsze;
+		}
+		
+		int getMinimum(){
+			if(isEmpty()){
+                    return -1;
+			}else{
+                    return tree[1];
+			}
+		}
+
+          void minHeapSiftUp(int idx){
+               if(idx==1) return;
+               int pt= getParentIdx(idx);
+               
+               if(tree[pt] > tree[idx]){
+               	int tmp= tree[pt];
+               	tree[pt]= tree[idx];
+               	tree[idx]= tmp;
+               	minHeapSiftUp(pt);
+               }
+          }
+          
+          void minHeapInsert(int val){
+          	hpsze++;
+          	tree[hpsze]=val;
+          	minHeapSiftUp(hpsze);
+          }
+          
+          void minHeapSiftDown(int idx){
+          	int lftidx= getLeftChildIdx(idx);
+          	int rgtidx= getRightChildIdx(idx);
+          	int mnidx;
+          	
+          	if(rgtidx > hpsze){
+          		if(lftidx > hpsze) return;
+          		else mnidx= lftidx;
+          	}else{
+          		if(tree[rgtidx] >= tree[lftidx]){
+          			mnidx= lftidx;
+          		}else mnidx= rgtidx;
+          	}
+          	
+          	if(tree[mnidx] < tree[idx]){
+          		int tmp= tree[mnidx];
+          		tree[mnidx]= tree[idx];
+          		tree[idx]= tmp;
+          		minHeapSiftDown(mnidx);
+          	}
+          	return;
+          }
+          
+          void removeMin(){
+          	if(isEmpty()) return;
+          	
+          	tree[1]= tree[hpsze];
+          	hpsze--;
+          	if(hpsze>0) minHeapSiftDown(1);
+          }
+          
+          ~MinHeap(){
+        		tree.clear();
+        		hpsze=0;
+   		 }
+};
+
+class MaxHeap{
+	private:
+		vector<int> tree;
+		int hpsze;
+		
+		int getLeftChildIdx(int i){
+			return 2*i;
+		}
+		
+		int getRightChildIdx(int i){
+			return 2*i+1;
+		}
+		
+		int getParentIdx(int i){
+			return i/2;
+		}
+		
+	public:
+		
+		MaxHeap(int n){
+			        tree.resize(4*n);
+			        hpsze=0;
+		}
+		
+		bool isEmpty(){
+			return (hpsze==0);
+		}
+		
+		int getSize(){
+			return hpsze;
+		}
+		
+		int getMaximum(){
+			if(isEmpty()){
+                    return -1;
+			}else{
+                    return tree[1];
+			}
+		}
+
+          void maxHeapSiftUp(int idx){
+               if(idx==1) return;
+               int pt= getParentIdx(idx);
+               
+               if(tree[pt] < tree[idx]){
+               	int tmp= tree[pt];
+               	tree[pt]= tree[idx];
+               	tree[idx]= tmp;
+               	maxHeapSiftUp(pt);
+               }
+          }
+          
+          void maxHeapInsert(int val){
+          	hpsze++;
+          	tree[hpsze]=val;
+          	maxHeapSiftUp(hpsze);
+          }
+          
+          void maxHeapSiftDown(int idx){
+          	int lftidx= getLeftChildIdx(idx);
+          	int rgtidx= getRightChildIdx(idx);
+          	int mxidx;
+          	
+          	if(rgtidx > hpsze){
+          		if(lftidx > hpsze) return;
+          		else mxidx= lftidx;
+          	}else{
+          		if(tree[rgtidx] <= tree[lftidx]){
+          			mxidx= lftidx;
+          		}else mxidx= rgtidx;
+          	}
+          	
+          	if(tree[mxidx] > tree[idx]){
+          		int tmp= tree[mxidx];
+          		tree[mxidx]= tree[idx];
+          		tree[idx]= tmp;
+          		maxHeapSiftDown(mxidx);
+          	}
+          	return;
+          }
+          
+          void removeMax(){
+          	if(isEmpty()) return;
+          	
+          	tree[1]= tree[hpsze];
+          	hpsze--;
+          	if(hpsze>0) maxHeapSiftDown(1);
+          }
+          
+          ~MaxHeap(){
+        		tree.clear();
+        		hpsze=0;
+   		 }
+};
+
+int main(){
+	int n=10000;
+	MinHeap mnh(n);
+	MaxHeap mxh(n);
+	int ret=0;
+	
+	for(int i=0;i<n;i++){
+		int x;
+		cin >> x;
+		
+		if(i==0){
+			mxh.maxHeapInsert(x);
+			continue;
+		}
+		
+		int med;
+		
+		if(mxh.getSize() >= mnh.getSize()){
+			med= mxh.getMaximum();
+		}else med= mnh.getMinimum();
+		
+		//cout << med << endl;	
+		ret+= med;
+		ret%=10000;
+		
+		if(med > x){
+			mxh.maxHeapInsert(x);
+		}else mnh.minHeapInsert(x);
+
+
+		if(mxh.getSize() - mnh.getSize() > 1){
+			int gt= mxh.getMaximum();
+			mxh.removeMax();
+			mnh.minHeapInsert(gt);
+		}else if(mnh.getSize() - mxh.getSize() > 1){
+			int gt= mnh.getMinimum();
+			mnh.removeMin();
+			mxh.maxHeapInsert(gt);
+		}
+	}
+	
+	int med;
+	
+	if(mxh.getSize() >= mnh.getSize()){
+		med= mxh.getMaximum();
+	}else med= mnh.getMinimum();
+	//cout << med << endl;
+	ret+= med;
+	ret%=10000;
+	
+	cout << ret << endl;
+	return 0;
+}	
+
+// END.
